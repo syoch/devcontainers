@@ -1,5 +1,5 @@
 {
-  "id": "ESP-IDF",
+  "id": "esp-idf",
   "version": "1.0.0",
   "name": "ESP-IDF Installation",
   "description": "Installs ESP-IDF",
