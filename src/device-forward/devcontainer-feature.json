@@ -1,5 +1,5 @@
 {
-  "id": "ncrobo-device-forward",
+  "id": "device-forward",
   "version": "1.0.0",
   "name": "Forwarding devices",
   "description": "Forwarding Linux devices to the container",

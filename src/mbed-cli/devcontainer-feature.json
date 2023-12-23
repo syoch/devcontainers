@@ -1,5 +1,5 @@
 {
-  "id": "ncrobo-mbed-cli",
+  "id": "mbed-cli",
   "version": "1.0.0",
   "name": "Mbed CLI Installation",
   "description": "Installs Mbed CLI 1.10.5",
