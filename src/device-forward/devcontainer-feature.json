@@ -9,7 +9,7 @@
     "serial",
     "disk"
   ],
-  "privileged": true, // for USB access
+  "privileged": true,
   "mounts": [
     "type=bind,source=/dev/bus/usb,target=/dev/bus/usb",
     "source=/dev/disk/by-id,target=/dev/disk/by-id,type=bind",
