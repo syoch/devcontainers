@@ -4,11 +4,6 @@
   "name": "Mbed CLI Installation",
   "description": "Installs Mbed CLI 1.10.5",
   "licenseURL": "https://opensource.org/license/mit/",
-  "keywords": [
-    "mbed",
-    "mcu",
-    "mbed-cli"
-  ],
   "options": {
     "version": {
       "type": "string",

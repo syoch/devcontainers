@@ -4,11 +4,6 @@
   "name": "Forwarding devices",
   "description": "Forwarding Linux devices to the container",
   "licenseURL": "https://opensource.org/license/mit/",
-  "keywords": [
-    "usb",
-    "serial",
-    "disk"
-  ],
   "privileged": true,
   "mounts": [
     "type=bind,source=/dev/bus/usb,target=/dev/bus/usb",
