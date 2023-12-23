@@ -1,0 +1,19 @@
+{
+  "id": "ncrobo-mbed-cli",
+  "version": "1.0.0",
+  "name": "Mbed CLI Installation",
+  "description": "Installs Mbed CLI 1.10.5",
+  "licenseURL": "https://opensource.org/license/mit/",
+  "keywords": [
+    "mbed",
+    "mcu",
+    "mbed-cli"
+  ],
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "1.10.5",
+      "description": "Mbed CLI version to install"
+    }
+  }
+}
