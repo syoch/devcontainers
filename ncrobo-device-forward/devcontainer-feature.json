@@ -1,0 +1,19 @@
+{
+  "id": "ncrobo-device-forward",
+  "version": "1.0.0",
+  "name": "Forwarding devices",
+  "description": "Forwarding Linux devices to the container",
+  "licenseURL": "https://opensource.org/license/mit/",
+  "keywords": [
+    "usb",
+    "serial",
+    "disk"
+  ],
+  "privileged": true, // for USB access
+  "mounts": [
+    "type=bind,source=/dev/bus/usb,target=/dev/bus/usb",
+    "source=/dev/disk/by-id,target=/dev/disk/by-id,type=bind",
+    "source=/dev/serial/by-id,target=/dev/serial/by-id,type=bind",
+    "source=/run/udev,target=/run/udev,readonly,type=bind"
+  ]
+}
