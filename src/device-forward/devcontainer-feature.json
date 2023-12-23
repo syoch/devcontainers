@@ -1,6 +1,6 @@
 {
   "id": "device-forward",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "Forwarding devices",
   "description": "Forwarding Linux devices to the container",
   "licenseURL": "https://opensource.org/license/mit/",
