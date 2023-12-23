@@ -5,10 +5,10 @@
   "description": "Installs ESP-IDF",
   "licenseURL": "https://opensource.org/license/mit/",
   "options": {
-    "version": {
+    "target": {
       "type": "string",
-      "default": "1.10.5",
-      "description": "Mbed CLI version to install"
+      "default": "v5.0.5",
+      "description": "ESP-IDF branch or tag to install"
     }
   }
 }
