@@ -1,6 +1,6 @@
 {
   "id": "esp-idf",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "name": "ESP-IDF Installation",
   "description": "Installs ESP-IDF",
   "licenseURL": "https://opensource.org/license/mit/",
