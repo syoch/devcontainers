@@ -1,0 +1,14 @@
+{
+  "id": "ESP-IDF",
+  "version": "1.0.0",
+  "name": "ESP-IDF Installation",
+  "description": "Installs ESP-IDF",
+  "licenseURL": "https://opensource.org/license/mit/",
+  "options": {
+    "version": {
+      "type": "string",
+      "default": "1.10.5",
+      "description": "Mbed CLI version to install"
+    }
+  }
+}
