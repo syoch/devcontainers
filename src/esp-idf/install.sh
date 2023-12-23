@@ -3,7 +3,9 @@
 set -e
 
 apt update
-apt install -y python3 python3-venv
+apt install -y python3 python3-venv \
+    cmake ninja-build ccache \
+    libffi-dev libssl-dev dfu-util libusb-1.0-0
 rm -rf /var/lib/apt/lists/*
 
 mkdir /opt/esp-idf
