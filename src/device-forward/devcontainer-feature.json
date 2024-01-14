@@ -1,6 +1,6 @@
 {
   "id": "device-forward",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "Forwarding devices",
   "description": "Forwarding Linux devices to the container",
   "licenseURL": "https://opensource.org/license/mit/",
@@ -8,23 +8,13 @@
   "mounts": [
     {
       "type": "bind",
-      "source": "/dev/bus/usb",
-      "target": "/dev/bus/usb"
+      "source": "/dev",
+      "target": "/dev"
     },
     {
       "type": "bind",
-      "source": "/dev/disk/by-id",
-      "target": "/dev/disk/by-id"
-    },
-    {
-      "type": "bind",
-      "source": "/dev/serial/by-id",
-      "target": "/dev/serial/by-id"
-    },
-    {
-      "type": "bind",
-      "source": "/run/udev",
-      "target": "/run/udev,readonly"
+      "source": "/run",
+      "target": "/run"
     }
   ]
 }
