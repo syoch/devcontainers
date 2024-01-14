@@ -23,5 +23,5 @@ rm -rf gcc-arm-none-eabi.tar.bz2
 
 cd /
 
-mbed config -G GCC_ARM_PATH /opt/gcc-arm-none-eabi-10.3-2021.10/bin
-mbed toolchain -G GCC_ARM
+sudo -u vscode mbed config -G GCC_ARM_PATH /opt/gcc-arm-none-eabi-10.3-2021.10/bin
+sudo -u vscode mbed toolchain -G GCC_ARM

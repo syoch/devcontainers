@@ -1,6 +1,6 @@
 {
   "id": "mbed-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "name": "Mbed CLI Installation",
   "description": "Installs Mbed CLI 1.10.5",
   "licenseURL": "https://opensource.org/license/mit/",
