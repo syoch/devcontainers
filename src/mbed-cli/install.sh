@@ -4,8 +4,8 @@ set -e
 
 apt-get update
 apt-get install -y \
-  python3="3.10.6-1~22.04" \
-  python3-dev="3.10.6-1~22.04" \
+  python3="3.10.6-1~22.04.1" \
+  python3-dev="3.10.6-1~22.04.1" \
   python3-pip="22.0.2+dfsg-1ubuntu0.4" \
   mercurial="6.1.1-1ubuntu1"
 
