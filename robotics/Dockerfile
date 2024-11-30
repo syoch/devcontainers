@@ -11,8 +11,6 @@ RUN make -C /opt/container install_qemu_arm
 # Install libraries
 
 RUN make -C /opt/container setup_mbed
-RUN make -C /opt/container setup_node
-RUN make -C /opt/container setup_rust
 
 # Machine specific setup
 
