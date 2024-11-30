@@ -19,10 +19,11 @@ $(MARKER)/install_build_tools: $(MARKER)
 		ccache \
 		librsvg2-bin \
 		socat \
-		python3="3.10.6-1~22.04.1" \
-		python3-dev="3.10.6-1~22.04.1" \
+		python3 \
+		python3-dev \
 		python3-pip \
-		mercurial="6.1.1-1ubuntu1"
+		python3-venv \
+		mercurial
 	@rm -rf /var/lib/apt/lists/*
 
 	@touch $@
@@ -104,6 +105,17 @@ $(MARKER)/setup_node: $(MARKER)
 .PHONY: setup_node
 setup_node: $(MARKER)/setup_node
 
+setup_rust_:
+	@curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+	@. ~/.cargo/env; rustup override set nightly
+	@. ~/.cargo/env; rustup target add thumbv7em-none-eabi
+	@. ~/.cargo/env; rustup component add rust-src
+	@. ~/.cargo/env; cargo install cargo-binstall
+	@. ~/.cargo/env; yes | cargo binstall cargo-generate cbindgen
+
+	@. ~/.cargo/env; rustup component add rustfmt clippy
+
 $(MARKER)/setup_rust: $(MARKER)
 	@printf "\e[32mSetting up Rust\e[0m\n"
 
@@ -111,15 +123,7 @@ $(MARKER)/setup_rust: $(MARKER)
 	@sudo apt install -y libx11-6 clang
 	@sudo rm -rf /var/lib/apt/lists/*
 
-	@curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-
-	@. ~/.cargo/env; rustup override set nightly
-	@. ~/.cargo/env; rustup target add thumbv7em-none-eabi
-	@. ~/.cargo/env; rustup component add rust-src
-	@. ~/.cargo/env; cargo install cargo-binstall
-	@. ~/.cargo/env; yes | cargo binstall cargo-generate
-
-	@. ~/.cargo/env; rustup component add rustfmt clippy
+	@sudo vscode $(MAKE) setup_rust_
 
 	@touch $@
 

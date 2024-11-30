@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:jammy
+FROM mcr.microsoft.com/devcontainers/base:bookworm
 
 ADD ./Makefile /opt/container/Makefile
 
