@@ -1,0 +1,29 @@
+version: "3"
+
+env:
+  version: "1.0.0"
+
+tasks:
+  default:
+    desc: show commands
+    cmds:
+      - task -l --sort none
+
+  build:
+    desc: Build all the things
+
+  build-robotics-image:
+    desc: Build the robotics image
+    cmds:
+      - docker build -t ghcr.io/syoch/robotics:{{ .VERSION }} ./robotics
+
+  push-robotics-image:
+    desc: Push the robotics image
+    cmds:
+      - docker push ghcr.io/syoch/robotics:{{ .VERSION }}
+
+  deploy-robotics-image:
+    desc: Deploy the robotics image to ghcr
+    cmds:
+      - task: build-robotics-image
+      - task: push-robotics-image

@@ -36,3 +36,15 @@ RUN /opt/container/scripts/setup_rust.sh
 
 #* Add some tools to container
 ADD ./container /opt/container
+
+#* Install Utilities to container
+USER root
+
+RUN sudo apt update && sudo apt install -y tmux clangd clang-format llvm lld clang-tools && sudo rm -rf /var/lib/apt/lists/*
+
+#* User utilities
+USER vscode
+
+RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin && echo 'eval "$(task --completion bash)"' >>~/.bashrc
+RUN /opt/container/scripts/setup_rust.sh
+RUN bash -c "~/.cargo/bin/cargo binstall -y cbindgen"
