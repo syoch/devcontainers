@@ -40,7 +40,7 @@ ADD ./container /opt/container
 #* Install Utilities to container
 USER root
 
-RUN sudo apt update && sudo apt install -y tmux clangd clang-format llvm lld clang-tools && sudo rm -rf /var/lib/apt/lists/*
+RUN sudo apt update && sudo apt install -y tmux && sudo rm -rf /var/lib/apt/lists/*
 
 #* User utilities
 USER vscode
@@ -48,3 +48,14 @@ USER vscode
 RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin && echo 'eval "$(task --completion bash)"' >>~/.bashrc
 RUN /opt/container/scripts/setup_rust.sh
 RUN bash -c "~/.cargo/bin/cargo binstall -y cbindgen"
+
+#* Clang
+USER root
+
+RUN apt update && apt install -y lsb-release wget software-properties-common gnupg && rm -rf /var/lib/apt/lists/*
+RUN bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
+RUN sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-18 1
+RUN sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-18 1
+RUN sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-18 1
+
+# clangd clang-format llvm lld clang-tools
