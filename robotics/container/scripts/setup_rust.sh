@@ -17,6 +17,6 @@ rustup component add rust-src
 
 cargo install cargo-binstall
 
-yes | cargo binstall cargo-generate cbindgen
+cargo binstall -y cargo-generate cbindgen
 
 rustup component add rustfmt clippy
