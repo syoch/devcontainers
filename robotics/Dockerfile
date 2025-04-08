@@ -116,3 +116,12 @@ RUN apt-get update && \
 USER vscode
 RUN echo ". /opt/esp-idf/export.sh" >> ~/.bashrc && \
     echo "set auto-load safe-path /" >> ~/.gdbinit
+COPY dotfiles/.gdbinit /home/vscode/.gdbinit
+
+USER root
+COPY robotics /usr/share/robotics
+
+#* ========================
+#* Cleanup
+#* ========================
+USER vscode
