@@ -6,9 +6,21 @@ string(REGEX REPLACE "STM32(..).*" "\\1" STM32_FAMILY ${STM32CUBE_TARGET})
 
 include(FetchContent)
 
+if (NOT STM32CUBE_HASH)
+  if (STM32_FAMILY STREQUAL "F3")
+    set(STM32CUBE_HASH "1e7cbc6439178007ce021aabc2ed2580572e753a")
+    set(STM32CUBE_TARGET_MACRO "STM32F303x8")
+  elseif (STM32_FAMILY STREQUAL "F4")
+    set(STM32CUBE_HASH "b8a21834c127ecc82c87c982d14de8cb3a65cf56")
+    set(STM32CUBE_TARGET_MACRO "STM32F446xx")
+  else()
+    message(FATAL_ERROR "STM32CUBE_HASH is not defined and no default hash is available for STM32 family ${STM32_FAMILY}")
+  endif()
+endif()
+
 FetchContent_Populate(STM32Cube
   GIT_REPOSITORY git@github.com:STMicroelectronics/STM32Cube${STM32_FAMILY}.git
-  GIT_TAG 1e7cbc6439178007ce021aabc2ed2580572e753a
+  GIT_TAG ${STM32CUBE_HASH}
   SOURCE_DIR /usr/arm-none-eabi/src/STM32Cube${STM32_FAMILY}
   BINARY_DIR ${CMAKE_BINARY_DIR}/3rd-party/STM32Cube${STM32_FAMILY}/build
   SUBBUILD_DIR ${CMAKE_BINARY_DIR}/3rd-party/STM32Cube${STM32_FAMILY}/subbuild
@@ -29,28 +41,22 @@ target_include_directories(stm32cube-cmsis INTERFACE
 target_link_libraries(stm32cube-cmsis INTERFACE cmsis)
 
 #* ----------------- STM32Cube ----------------- *#
-
-add_library(stm32cube STATIC)
+string(TOLOWER STM32_FAMILY_LOWER ${STM32_FAMILY})
 
 file(GLOB_RECURSE HAL_SOURCES CONFIGURE_DEPENDS
   "${stm32cube_SOURCE_DIR}/Core/*.cpp"
   "${stm32cube_SOURCE_DIR}/Core/*.c"
-  "${stm32cube_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/*.c"
+  "${stm32cube_SOURCE_DIR}/Drivers/STM32${STM32_FAMILY}xx_HAL_Driver/*.c"
 )
-list(REMOVE_ITEM HAL_SOURCES "${stm32cube_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_timebase_rtc_alarm_template.c")
-list(REMOVE_ITEM HAL_SOURCES "${stm32cube_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_timebase_rtc_wakeup_template.c")
-list(REMOVE_ITEM HAL_SOURCES "${stm32cube_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_timebase_tim_template.c")
-list(REMOVE_ITEM HAL_SOURCES "${stm32cube_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Src/stm32f3xx_hal_msp_template.c")
-target_sources(stm32cube PRIVATE ${HAL_SOURCES})
+list(FILTER HAL_SOURCES EXCLUDE REGEX "template\.c$")
+
+add_library(stm32cube STATIC ${HAL_SOURCES})
 
 set(HAL_INCLUDES "")
 list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Core/Inc")
-list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Drivers/STM32F3xx_HAL_Driver/Inc")
+list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Drivers/STM32${STM32_FAMILY}xx_HAL_Driver/Inc")
+list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32${STM32_FAMILY}xx/Include")
 target_include_directories(stm32cube PUBLIC ${HAL_INCLUDES})
 
 target_link_libraries(stm32cube PUBLIC stm32cube-conf stm32cube-cmsis)
-
-string(REGEX REPLACE "STM32(....)K(.).." "STM32\\1x\\2" STM32CUBE_TARGET_MACRO ${STM32CUBE_TARGET})
-target_compile_definitions(stm32cube PUBLIC
-  -D${STM32CUBE_TARGET_MACRO}
-)
+target_compile_definitions(stm32cube PUBLIC -D${STM32CUBE_TARGET_MACRO})
