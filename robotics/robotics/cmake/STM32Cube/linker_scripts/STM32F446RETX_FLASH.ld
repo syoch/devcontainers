@@ -7,23 +7,19 @@ _estack = ORIGIN(RAM) + LENGTH(RAM); /* end of "RAM" Ram type memory */
 _Min_Heap_Size = 0x200; /* required amount of heap */
 _Min_Stack_Size = 0x400; /* required amount of stack */
 
-MEMORY
-{
+MEMORY {
   RAM    (xrw): ORIGIN = 0x20000000, LENGTH = 128K
   FLASH   (rx): ORIGIN = 0x08000000, LENGTH = 512K
 }
 
-SECTIONS
-{
-  .isr_vector:
-  {
+SECTIONS {
+  .isr_vector : {
     . = ALIGN(4);
     KEEP(*(.isr_vector))
     . = ALIGN(4);
   } >FLASH
 
-  .text:
-  {
+  .text : {
     . = ALIGN(4);
     *(.text)           /* .text sections (code) */
     *(.text*)          /* .text* sections (code) */
@@ -38,18 +34,16 @@ SECTIONS
     _etext = .;        /* define a global symbols at end of code */
   } >FLASH
 
-  .rodata:
-  {
+  .rodata : {
     . = ALIGN(4);
     *(.rodata)         /* .rodata sections (constants, strings, etc.) */
     *(.rodata*)        /* .rodata* sections (constants, strings, etc.) */
     . = ALIGN(4);
   } >FLASH
 
-  .ARM.extab: { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
+  .ARM.extab : { *(.ARM.extab* .gnu.linkonce.armextab.*) } >FLASH
 
-  .ARM:
-  {
+  .ARM : {
     . = ALIGN(4);
     __exidx_start = .;
     *(.ARM.exidx*)
@@ -57,8 +51,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .preinit_array:
-  {
+  .preinit_array : {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__preinit_array_start = .);
     KEEP (*(.preinit_array*))
@@ -66,8 +59,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .init_array:
-  {
+  .init_array : {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__init_array_start = .);
     KEEP (*(SORT(.init_array.*)))
@@ -76,8 +68,7 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
-  .fini_array:
-  {
+  .fini_array : {
     . = ALIGN(4);
     PROVIDE_HIDDEN (__fini_array_start = .);
     KEEP (*(SORT(.fini_array.*)))
@@ -88,8 +79,7 @@ SECTIONS
 
   _sidata = LOADADDR(.data);
 
-  .data:
-  {
+  .data : {
     . = ALIGN(4);
     _sdata = .;        /* create a global symbol at data start */
     *(.data)           /* .data sections */
@@ -102,8 +92,7 @@ SECTIONS
   } >RAM AT> FLASH
 
   . = ALIGN(4);
-  .bss:
-  {
+  .bss : {
     /* This is used by the startup in order to initialize the .bss section */
     _sbss = .;         /* define a global symbol at bss start */
     __bss_start__ = _sbss;
@@ -116,8 +105,7 @@ SECTIONS
     __bss_end__ = _ebss;
   } >RAM
 
-  ._user_heap_stack:
-  {
+  ._user_heap_stack : {
     . = ALIGN(8);
     PROVIDE ( end = . );
     PROVIDE ( _end = . );
@@ -126,7 +114,7 @@ SECTIONS
     . = ALIGN(8);
   } >RAM
 
-  /DISCARD/:
+  /DISCARD/ :
   {
     libc.a ( * )
     libm.a ( * )
