@@ -1,3 +1,5 @@
+include_guard(GLOBAL)
+
 if (NOT STM32CUBE_TARGET)
   message(FATAL_ERROR "STM32CUBE_TARGET is not defined")
 endif()
@@ -55,8 +57,9 @@ add_library(stm32cube STATIC ${HAL_SOURCES})
 set(HAL_INCLUDES "")
 list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Core/Inc")
 list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Drivers/STM32${STM32_FAMILY}xx_HAL_Driver/Inc")
+list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Drivers/CMSIS/Include")
 list(APPEND HAL_INCLUDES "${stm32cube_SOURCE_DIR}/Drivers/CMSIS/Device/ST/STM32${STM32_FAMILY}xx/Include")
+list(APPEND HAL_INCLUDES "/usr/share/robotics/cmake/STM32Cube/stm32cube-conf")
 target_include_directories(stm32cube PUBLIC ${HAL_INCLUDES})
 
-target_link_libraries(stm32cube PUBLIC stm32cube-conf stm32cube-cmsis)
 target_compile_definitions(stm32cube PUBLIC -D${STM32CUBE_TARGET_MACRO})
