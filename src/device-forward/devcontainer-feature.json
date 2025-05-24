@@ -1,20 +1,8 @@
 {
   "id": "device-forward",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "Forwarding devices",
   "description": "Forwarding Linux devices to the container",
   "licenseURL": "https://opensource.org/license/mit/",
-  "privileged": true,
-  "mounts": [
-    {
-      "type": "bind",
-      "source": "/dev",
-      "target": "/dev"
-    },
-    {
-      "type": "bind",
-      "source": "/run",
-      "target": "/run"
-    }
-  ]
+  "privileged": true
 }
