@@ -1,3 +1,14 @@
+FROM mcr.microsoft.com/devcontainers/base:bookworm AS rust
+
+USER vscode
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
+    ~/.cargo/bin/rustup override set nightly && \
+    ~/.cargo/bin/rustup target add thumbv7em-none-eabi && \
+    ~/.cargo/bin/rustup component add rust-src
+RUN ~/.cargo/bin/cargo install cargo-binstall && \
+    ~/.cargo/bin/cargo binstall -y cargo-generate cbindgen && \
+    ~/.cargo/bin/rustup component add rustfmt clippy
+
 FROM mcr.microsoft.com/devcontainers/base:bookworm
 
 # Fixup permissions for uucp
@@ -18,104 +29,80 @@ RUN sudo apt update && \
     && \
     rm -rf /var/lib/apt/lists/*
 
-# CMake
-RUN wget https://github.com/Kitware/CMake/releases/download/v4.0.0/cmake-4.0.0-linux-x86_64.sh -O /tmp/cmake.sh && \
-    chmod +x /tmp/cmake.sh && \
-    sudo mkdir /opt/cmake && \
-    sudo /tmp/cmake.sh --skip-license --prefix=/opt/cmake && \
-    rm /tmp/cmake.sh && \
-    sudo ln -s /opt/cmake/bin/cmake /usr/local/bin/cmake
 
 # Clang
-RUN wget https://apt.llvm.org/llvm.sh -O /tmp/llvm.sh && \
-    chmod +x /tmp/llvm.sh && \
-    /tmp/llvm.sh 19 && \
-    rm /tmp/llvm.sh && \
-    sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-19 1 && \
-    sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-19 1 && \
-    sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-19 1
+USER root
+RUN curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/llvm.gpg] http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm main" | tee /etc/apt/sources.list.d/llvm.list > /dev/nul && \
+    apt update && \
+    apt install -y clang clangd && \
+    rm -rf /var/lib/apt/lists/*
 
-# arm-none-eabi
-ARG TOOLCHAIN_URL=https://developer.arm.com/-/media/Files/downloads/gnu/13.3.rel1/binrel/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi.tar.xz
+#* ========================
+#* .NET
+#* ========================
+# USER root
+# WORKDIR /tmp
+# RUN wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
+#     dpkg -i packages-microsoft-prod.deb && \
+#     rm packages-microsoft-prod.deb && \
+#     apt-get update && \
+#     apt-get install -y dotnet-sdk-8.0 && \
+#     rm -rf /var/lib/apt/lists/*
 
-RUN wget $TOOLCHAIN_URL -O /tmp/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi.tar.xz && \
-    sudo tar -xf /tmp/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi.tar.xz -C /opt && \
-    sudo mv /opt/arm-gnu-toolchain-13.3.rel1-x86_64-arm-none-eabi /opt/arm-none-eabi && \
-    sudo ln -sr /opt/arm-none-eabi/bin/arm-none-eabi-* /usr/bin
-
-#* User utilities
-USER vscode
-
-# nvm
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash && \
-    bash -c "source ~/.nvm/nvm.sh && nvm install 20"
-
-# task
-RUN sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b ~/.local/bin && \
-    echo 'eval "$(task --completion bash)"' >>~/.bashrc
-
-# Rust
-RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y && \
-    ~/.cargo/bin/rustup override set nightly && \
-    ~/.cargo/bin/rustup target add thumbv7em-none-eabi && \
-    ~/.cargo/bin/rustup component add rust-src
-RUN ~/.cargo/bin/cargo install cargo-binstall && \
-    ~/.cargo/bin/cargo binstall -y cargo-generate cbindgen && \
-    ~/.cargo/bin/rustup component add rustfmt clippy
+#* ========================
+#* Custom Repository
+#* ========================
+ARG ROBO_EP=http://100.89.117.6
+USER root
+RUN echo "deb [trusted=yes] $ROBO_EP/debs/mbed ./" >> /etc/apt/sources.list && \
+    echo "deb [trusted=yes] $ROBO_EP/debs/tools ./" >> /etc/apt/sources.list && \
+    echo "deb [trusted=yes] $ROBO_EP/debs/libs ./" >> /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y \
+    static-mbed-os-nucleo_f303k8=1.0.1 static-mbed-os-nucleo_f446re=1.0.1 \
+    xpack-qemu-arm=8.2.2.1 arm-none-eabi=13.3 task=3.43.3 cmake=4.0.2-1 \
+    ikako-mdc=1.0.0 ikako-robomas=1.0.0 \
+    ikarashi-can-mk2=1.0.0 motor-controller=1.0.0 \
+    && \
+    rm -rf /var/lib/apt/lists/*
 
 
 #* ========================
 #* Libraries
 #* ========================
-USER vscode
-RUN sudo mkdir /usr/arm-none-eabi && \
-    sudo chmod -R 777 /usr/arm-none-eabi
+USER root
+RUN chmod -R 777 /usr/arm-none-eabi && \
+    chown -R vscode:vscode /usr/arm-none-eabi
 
+USER vscode
 RUN git clone https://github.com/nnctroboticsclub/libs-cmake.git /tmp/libs-cmake  && \
     make -C /tmp/libs-cmake install
 
-RUN git clone https://github.com/nnctroboticsclub/static-mbed-os.git /tmp/static-mbed-os && \
-    make -C /tmp/static-mbed-os install TARGET=NUCLEO_F303K8 && \
-    make -C /tmp/static-mbed-os install TARGET=NUCLEO_F446RE
+# RUN sudo mkdir /opt/esp-idf || true && \
+#     sudo chmod -R 777 /opt/esp-idf && \
+#     git clone --recursive https://github.com/espressif/esp-idf.git /opt/esp-idf -b v5.0.5
+# RUN sudo chown -R vscode:vscode /opt/esp-idf && \
+#     sudo chmod -R 777 /opt/esp-idf && \
+#     /opt/esp-idf/install.sh esp32 --enable-gdbgui
 
-RUN sudo mkdir /opt/esp-idf || true && \
-    sudo chmod -R 777 /opt/esp-idf && \
-    git clone --recursive https://github.com/espressif/esp-idf.git /opt/esp-idf -b v5.0.5
-RUN sudo chown -R vscode:vscode /opt/esp-idf && \
-    sudo chmod -R 777 /opt/esp-idf && \
-    /opt/esp-idf/install.sh esp32 --enable-gdbgui
-
-
-#* ========================
-#* Debugging tools
-#* ========================
-USER root
-ARG QEMU_URL="https://github.com/xpack-dev-tools/qemu-arm-xpack/releases/download/v8.2.2-1/xpack-qemu-arm-8.2.2-1-linux-x64.tar.gz"
-RUN sudo wget $QEMU_URL -O /tmp/xpack-qemu.tgz && \
-    sudo tar -xf /tmp/xpack-qemu.tgz -C /opt && \
-    sudo mv /opt/xpack-qemu-arm-8.2.2-1 /opt/xpack-qemu-arm && \
-    sudo ln -s /opt/xpack-qemu-arm-8.2.2-1/bin/* /usr/bin
-
-
-#* ========================
-#* .NET
-#* ========================
-USER root
-WORKDIR /tmp
-RUN wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb && \
-    dpkg -i packages-microsoft-prod.deb && \
-    rm packages-microsoft-prod.deb
-
-RUN apt-get update && \
-    apt-get install -y dotnet-sdk-8.0 && \
-    rm -rf /var/lib/apt/lists/*
+COPY --from=rust /home/vscode/.cargo /home/vscode/.cargo
+COPY --from=rust /home/vscode/.rustup /home/vscode/.rustup
+RUN sudo chown -R vscode:vscode /home/vscode/.cargo && \
+    sudo chmod -R 777 /home/vscode/.cargo && \
+    sudo chown -R vscode:vscode /home/vscode/.rustup && \
+    sudo chmod -R 777 /home/vscode/.rustup
 
 #* ========================
 #* User environment
 #* ========================
 USER vscode
 RUN echo ". /opt/esp-idf/export.sh" >> ~/.bashrc && \
-    echo "set auto-load safe-path /" >> ~/.gdbinit
+    echo ". ~/.cargo/env" >> ~/.bashrc && \
+    echo "set auto-load safe-path /" >> ~/.gdbinit && \
+    echo "[net]" >> $HOME/.cargo/config.toml && \
+    echo "git-fetch-with-cli=true" >> $HOME/.cargo/config.toml
+
 COPY dotfiles/.gdbinit /home/vscode/.gdbinit
 
 USER root
