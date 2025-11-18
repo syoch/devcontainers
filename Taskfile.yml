@@ -15,7 +15,7 @@ tasks:
   build-robotics-image:
     desc: Build the robotics image
     cmds:
-      - docker build -t ghcr.io/syoch/robotics:{{ .VERSION }} ./robotics
+      - docker build --build-arg ROBO_EP=http://`tailscale ip -4`:9200 -t ghcr.io/syoch/robotics:{{ .VERSION }} ./robotics
 
   push-robotics-image:
     desc: Push the robotics image
